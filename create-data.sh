@@ -8,6 +8,7 @@
 # Copy in CQL files
 docker cp show-version.cql $CASSANDRA_NODE_1:/tmp
 docker cp create-db.cql    $CASSANDRA_NODE_1:/tmp
+docker cp query-db.cql    $CASSANDRA_NODE_1:/tmp
 
 
 # Get Node 1 ID

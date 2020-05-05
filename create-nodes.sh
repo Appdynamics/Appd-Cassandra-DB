@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 #
+# Maintainer: David Ryder, david.ryder@appdynamics.com
 
 
 CASSANDRA_CLUSTER_NAME="cluster1"

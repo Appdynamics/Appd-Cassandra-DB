@@ -1,0 +1,6 @@
+export CASSANDRA_CLUSTER_NAME="cluster1"
+export CASSANDRA_DATA_DIR="/tmp"
+export CASSANDRA_DC_NAME="DC1"
+export CASSANDRA_NODE_1="cnode1"
+export CASSANDRA_NODE_2="cnode2"
+export CASSANDRA_NODE_3="cnode3"

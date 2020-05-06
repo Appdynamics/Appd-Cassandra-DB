@@ -6,7 +6,9 @@ Instructions
 
 Clone this repository
 
-`git clone ...`
+`git clone https://github.com/Appdynamics/Appd-Cassandra-DB.git`
+
+The script `ctl.sh` performs all of the tasks adn uses the configuration information in `envvars.sh`
 
 Setup the Environment variables
 
@@ -14,11 +16,11 @@ Setup the Environment variables
 
 Update Ubuntu OS
 
-`ctl.sh update-ubuntu`
+`./ctl.sh update-ubuntu`
 
 Install latest version of Docker CE, version 19.03.8 recommended
 
-`ctl.sh docker install`
+`./ctl.sh docker install`
 
 Build the Docker images
 

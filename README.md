@@ -1,6 +1,6 @@
 # Appd-Cassandra-DB
 
-Deploy a multi node Cassandra DB cluster1
+Deploy a multi node Cassandra DB cluster using Docker.
 
 Instructions
 
@@ -18,7 +18,7 @@ Update Ubuntu OS
 
 `./ctl.sh update-ubuntu`
 
-Install latest version of Docker CE, version 19.03.8 recommended
+Install the latest version of Docker CE, version 19.03.8 recommended
 
 `./ctl.sh docker install`
 

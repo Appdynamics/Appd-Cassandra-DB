@@ -39,3 +39,7 @@ Create a keyspace, table and insert data
 Generate load on the DB
 
 `./ctl.sh load-gen 5 1`
+
+Stop and delete the nodes
+
+`./ctl.sh nodes-stop`

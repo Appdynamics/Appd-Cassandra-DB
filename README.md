@@ -1,6 +1,6 @@
 # Appd-Cassandra-DB
 
-Deploy a multi node Cassandra DB cluster1
+Deploy a multi node Cassandra DB cluster using Docker
 
 Instructions
 

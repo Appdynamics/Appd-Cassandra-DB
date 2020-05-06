@@ -64,7 +64,7 @@ _cassandra_nodes_create() {
          -e CASSANDRA_CLUSTER_NAME=$CASSANDRA_CLUSTER_NAME \
          -e CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch \
          -e CASSANDRA_DC=$CASSANDRA_DC_NAME \
-         -d cassandra:latest
+         -d $DOCKER_TAG_NAME
   sleep 5
   NODE1_IP=`docker inspect --format='{{ .NetworkSettings.IPAddress }}' $CASSANDRA_NODE_1`
   echo "Node 1 IP $NODE1_IP"
@@ -75,7 +75,7 @@ _cassandra_nodes_create() {
          -e CASSANDRA_CLUSTER_NAME=$CASSANDRA_CLUSTER_NAME \
          -e CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch \
          -e CASSANDRA_DC=$CASSANDRA_DC_NAME \
-         -d cassandra:latest
+         -d $DOCKER_TAG_NAME
   sleep 5
 
   NODE2_IP=`docker inspect --format='{{ .NetworkSettings.IPAddress }}' $CASSANDRA_NODE_2`
@@ -102,9 +102,9 @@ _cassandra_nodes_stop() {
 
 _cassandra_create_data() {
   # Copy in CQL files
-  docker cp show-version.cql $CASSANDRA_NODE_1:/tmp
-  docker cp create-db.cql    $CASSANDRA_NODE_1:/tmp
-  docker cp query-db.cql    $CASSANDRA_NODE_1:/tmp
+  #docker cp show-version.cql $CASSANDRA_NODE_1:/tmp
+  #docker cp create-db.cql    $CASSANDRA_NODE_1:/tmp
+  #docker cp query-db.cql    $CASSANDRA_NODE_1:/tmp
 
 
   # Get Node 1 ID
@@ -113,7 +113,7 @@ _cassandra_create_data() {
   docker exec -it $NODE1_ID nodetool status
 
   # Create keyspace, table and insert data
-  docker exec -it $NODE1_ID cqlsh -f /tmp/create-db.cql
+  docker exec -it $NODE1_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD -f /create-db.cql
 }
 
 
@@ -125,7 +125,7 @@ _cassandra_load_gen() {
   echo "Iterations $INTERATIONS_N Interval $INTERVAL_SEC"
   for i in $(seq $INTERATIONS_N )
   do
-    docker exec -it $NODE1_ID cqlsh -f /tmp/query-db.cql
+    docker exec -it $NODE1_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD -f /query-db.cql
     sleep $INTERVAL_SEC
   done
 }
@@ -142,12 +142,16 @@ case "$CMD_LIST" in
   docker-install)
     _DockerCE_Install
     ;;
+  build)
+    docker build -t $DOCKER_TAG_NAME .
+    ;;
   nodes-create)
   _cassandra_nodes_create
     ;;
   nodes-status)
     NODE1_ID=`docker inspect --format='{{ .Id }}' cnode1`
     docker exec -it $NODE1_ID nodetool status
+    docker exec -it $NODE1_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD -f /show-version.cql
     ;;
   nodes-stop)
     _cassandra_nodes_stop

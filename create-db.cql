@@ -15,9 +15,12 @@ INSERT INTO cities(id,name,country) VALUES (1,'Karachi','Pakistan');
 INSERT INTO cities(id,name,country) VALUES (2,'Lahore','Pakistan');
 INSERT INTO cities(id,name,country) VALUES (3,'Dubai','UAE');
 INSERT INTO cities(id,name,country) VALUES (4,'Berlin','Germany');
-
+INSERT INTO cities(id,name,country) VALUES (5,'San Francisco','USA');
+INSERT INTO cities(id,name,country) VALUES (6,'New York','USA');
+INSERT INTO cities(id,name,country) VALUES (7,'Dallas','USA');
+INSERT INTO cities(id,name,country) VALUES (8,'London','UK');
+INSERT INTO cities(id,name,country) VALUES (9,'Paris','France');
 
 select * from cities;
 
 exit;
-

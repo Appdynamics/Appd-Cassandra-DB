@@ -8,7 +8,7 @@ Clone this repository
 
 `git clone https://github.com/Appdynamics/Appd-Cassandra-DB.git`
 
-The script `ctl.sh` performs all of the tasks adn uses the configuration information in `envvars.sh`
+The script `ctl.sh` performs all of the tasks using the configuration information in `envvars.sh`
 
 Setup the Environment variables
 

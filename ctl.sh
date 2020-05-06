@@ -6,6 +6,8 @@
 #
 CMD_LIST=${1:-"help"}
 
+. envvars.sh
+
 _Ubuntu_Update() {
   # Update Ubuntu - quiet install, non noninteractive
   sudo apt-get update
@@ -54,6 +56,79 @@ _validateEnvironmentVars() {
   [ "$ERROR" == "1" ] && { echo "Exiting"; exit 1; }
 }
 
+_cassandra_nodes_create() {
+  docker run --rm --name $CASSANDRA_NODE_1 \
+         -p 9042:9042 \
+         -v "$CASSANDRA_DATA_DIR/$CASSANDRA_NODE_1":/var/lib/cassandra/data \
+         -e CASSANDRA_CLUSTER_NAME=$CASSANDRA_CLUSTER_NAME \
+         -e CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch \
+         -e CASSANDRA_DC=$CASSANDRA_DC_NAME \
+         -d cassandra:latest
+  sleep 5
+  NODE1_IP=`docker inspect --format='{{ .NetworkSettings.IPAddress }}' $CASSANDRA_NODE_1`
+  echo "Node 1 IP $NODE1_IP"
+
+  docker run --rm --name $CASSANDRA_NODE_2 \
+         -v "$CASSANDRA_DATA_DIR/$CASSANDRA_NODE_2":/var/lib/cassandra/data \
+         -e CASSANDRA_SEEDS="$NODE1_IP" \
+         -e CASSANDRA_CLUSTER_NAME=$CASSANDRA_CLUSTER_NAME \
+         -e CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch \
+         -e CASSANDRA_DC=$CASSANDRA_DC_NAME \
+         -d cassandra:latest
+  sleep 5
+
+  NODE2_IP=`docker inspect --format='{{ .NetworkSettings.IPAddress }}' $CASSANDRA_NODE_2`
+  echo "Node 2 IP $NODE2_IP"
+
+  # Get Node 1 ID
+  NODE1_ID=`docker inspect --format='{{ .Id }}' cnode1`
+  docker exec -it $NODE1_ID nodetool status
+}
+
+_cassandra_nodes_stop() {
+  NODE1_ID=`docker inspect --format='{{ .Id }}' $CASSANDRA_NODE_1`
+  NODE2_ID=`docker inspect --format='{{ .Id }}' $CASSANDRA_NODE_2`
+
+  echo $NODE1_ID
+  echo $NODE2_ID
+
+  docker stop  $NODE1_ID
+  docker stop  $NODE2_ID
+
+  rm -rf  $CASSANDRA_DATA_DIR/C$ASSANDRA_NODE_1
+  rm -rf  $CASSANDRA_DATA_DIR/C$ASSANDRA_NODE_2
+}
+
+_cassandra_create_data() {
+  # Copy in CQL files
+  docker cp show-version.cql $CASSANDRA_NODE_1:/tmp
+  docker cp create-db.cql    $CASSANDRA_NODE_1:/tmp
+  docker cp query-db.cql    $CASSANDRA_NODE_1:/tmp
+
+
+  # Get Node 1 ID
+  NODE1_ID=`docker inspect --format='{{ .Id }}' $CASSANDRA_NODE_1`
+
+  docker exec -it $NODE1_ID nodetool status
+
+  # Create keyspace, table and insert data
+  docker exec -it $NODE1_ID cqlsh -f /tmp/create-db.cql
+}
+
+
+_cassandra_load_gen() {
+  # Get Node 1 ID
+  NODE1_ID=`docker inspect --format='{{ .Id }}' cnode1`
+  INTERATIONS_N=${2:-"2"}
+  INTERVAL_SEC=${3:-"5"}
+  echo "Iterations $INTERATIONS_N Interval $INTERVAL_SEC"
+  for i in $(seq $INTERATIONS_N )
+  do
+    docker exec -it $NODE1_ID cqlsh -f /tmp/query-db.cql
+    sleep $INTERVAL_SEC
+  done
+}
+
 # Define the namespace and list of K8s resources to deploy into that namespace
 ALL_NS_LIST=("namespace-test")
 ALL_RUN_LIST=("alpine1" "alpine2" "busyboxes1" "busyboxes2")
@@ -66,11 +141,21 @@ case "$CMD_LIST" in
   docker-install)
     _DockerCE_Install
     ;;
-  services)
-    $KUBECTL_CMD get services --all-namespaces -o wide
+  nodes-create)
+  _cassandra_nodes_create
     ;;
-  ns)
-    $KUBECTL_CMD get all --all-namespaces
+  nodes-status)
+    NODE1_ID=`docker inspect --format='{{ .Id }}' cnode1`
+    docker exec -it $NODE1_ID nodetool status
+    ;;
+  nodes-stop)
+    _cassandra_nodes_stop
+    ;;
+  create-data)
+    _cassandra_create_data
+    ;;
+  load-gen)
+    _cassandra_load_gen $@
     ;;
   del-force)
     docker rmi $(docker images -q) -f
@@ -85,7 +170,7 @@ case "$CMD_LIST" in
     echo "Test"
     ;;
   help)
-    echo "ubuntu-update, docker-install, k8s-install, k8s-start, pods-create, appd-create-cluster-agent, appd-delete-cluster-agent"
+    echo "ubuntu-update, docker-install, nodes-create, nodes-status, nodes-stop"
     ;;
   *)
     echo "Not Found " "$@"

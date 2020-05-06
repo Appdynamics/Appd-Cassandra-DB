@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+# Deploys using Docker a multi node Cassandra cluster.
 #
 # Maintainer: David Ryder, david.ryder@appdynamics.com
 #

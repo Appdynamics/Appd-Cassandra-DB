@@ -8,5 +8,10 @@
 
 # Get Node 1 ID
 NODE1_ID=`docker inspect --format='{{ .Id }}' cnode1`
-
-docker exec -it $NODE1_ID cqlsh -f /tmp/query-db.cql
+INTERATIONS_N=1000
+INTERVAL_SEC=5
+for i in $(seq $INTERATIONS_N )
+do
+  docker exec -it $NODE1_ID cqlsh -f /tmp/query-db.cql
+  sleep $INTERVAL_SEC
+done

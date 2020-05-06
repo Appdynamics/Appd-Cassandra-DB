@@ -170,7 +170,7 @@ case "$CMD_LIST" in
     echo "Test"
     ;;
   help)
-    echo "ubuntu-update, docker-install, nodes-create, nodes-status, nodes-stop"
+    echo "ubuntu-update, docker-install, nodes-create, nodes-status, nodes-stop, create-data, load-gen"
     ;;
   *)
     echo "Not Found " "$@"

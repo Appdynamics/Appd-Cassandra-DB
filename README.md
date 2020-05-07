@@ -36,7 +36,7 @@ Check the status of the cluster nodes, wait for the nodes to start and sync
 
 Create a keyspace, table and insert data
 
-`./ctl.sh create-date`
+`./ctl.sh create-data`
 
 Generate load on the DB
 

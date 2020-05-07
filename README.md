@@ -36,15 +36,19 @@ Check the status of the cluster nodes, wait for the nodes to start and sync
 
 Create a keyspace, table and insert data
 
-`./ctl.sh create-date`
+`./ctl.sh create-data`
 
+<<<<<<< HEAD
 Turn on tracing
 
 `./ctl.sh nodes-trace`
 
 Generate load on the DB
+=======
+Generate load on the DB - 5000 iterations at 5 seconds each
+>>>>>>> ed725dda874963d936c7c6cd44d9f5313bac0f3e
 
-`./ctl.sh load-gen 5 1`
+`./ctl.sh load-gen 5000 5`
 
 Stop and delete the nodes
 

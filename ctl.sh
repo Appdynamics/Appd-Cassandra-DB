@@ -36,11 +36,6 @@ _DockerCE_Install() {
   #docker version
 
   #sudo systemctl status docker
-
-  # Pull Ubuntu Docker image into local repository
-  #docker pull ubuntu
-  #docker images
-  #docker search ubuntu
 }
 
 _validateEnvironmentVars() {
@@ -84,7 +79,7 @@ _cassandra_nodes_create() {
 
   # Get Node 1 ID
   NODE1_ID=`docker inspect --format='{{ .Id }}' cnode1`
-  docker exec -it $NODE1_ID nodetool status
+  docker exec -it $NODE1_ID nodetool -u $CASSANDRA_JMX_USER -pw $CASSANDRA_JMX_PWD status
 }
 
 _cassandra_nodes_stop() {
@@ -102,16 +97,10 @@ _cassandra_nodes_stop() {
 }
 
 _cassandra_create_data() {
-  # Copy in CQL files
-  #docker cp show-version.cql $CASSANDRA_NODE_1:/tmp
-  #docker cp create-db.cql    $CASSANDRA_NODE_1:/tmp
-  #docker cp query-db.cql    $CASSANDRA_NODE_1:/tmp
-
-
   # Get Node 1 ID
   NODE1_ID=`docker inspect --format='{{ .Id }}' $CASSANDRA_NODE_1`
 
-  docker exec -it $NODE1_ID nodetool status
+  docker exec -it $NODE1_ID nodetool -u $CASSANDRA_JMX_USER -pw $CASSANDRA_JMX_PWD status
 
   # Create keyspace, table and insert data
   docker exec -it $NODE1_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD -f $CASSANDRA_CONFIG_DIR/create-db.cql
@@ -120,7 +109,7 @@ _cassandra_create_data() {
 
 _cassandra_load_gen() {
   # Get Node 1 ID
-  NODE1_ID=`docker inspect --format='{{ .Id }}' cnode1`
+  NODE1_ID=`docker inspect --format='{{ .Id }}' $CASSANDRA_NODE_1`
   INTERATIONS_N=${2:-"2"}
   INTERVAL_SEC=${3:-"5"}
   echo "Iterations $INTERATIONS_N Interval $INTERVAL_SEC"
@@ -132,8 +121,9 @@ _cassandra_load_gen() {
 }
 
 _cassandra_configure() {
-  cp /cassandra/cassandra.yaml    /etc/cassandra
-  cp /cassandra/cassandra-env.sh  /etc/cassandra
+  cp $CASSANDRA_CONFIG_DIR/cassandra.yaml       /etc/cassandra
+  cp $CASSANDRA_CONFIG_DIR/cassandra-env.sh     /etc/cassandra
+  cp $CASSANDRA_CONFIG_DIR/jmxremote.password   /etc/cassandra
 }
 
 # Define the namespace and list of K8s resources to deploy into that namespace
@@ -155,15 +145,26 @@ case "$CMD_LIST" in
   _cassandra_nodes_create
     ;;
   nodes-status)
-    NODE1_ID=`docker inspect --format='{{ .Id }}' cnode1`
-    docker exec -it $NODE1_ID nodetool status
+    NODE1_ID=`docker inspect --format='{{ .Id }}' $CASSANDRA_NODE_1`
+    docker exec -it $NODE1_ID nodetool -u $CASSANDRA_JMX_USER -pw $CASSANDRA_JMX_PWD status
     docker exec -it $NODE1_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD -f $CASSANDRA_CONFIG_DIR/show-version.cql
     ;;
   nodes-stop)
     _cassandra_nodes_stop
     ;;
+  nodes-trace)
+    NODE1_ID=`docker inspect --format='{{ .Id }}' $CASSANDRA_NODE_1`
+    docker exec -it $NODE1_ID nodetool -u $CASSANDRA_JMX_USER -pw $CASSANDRA_JMX_PWD settraceprobability 1
+    docker exec -it $NODE1_ID nodetool -u $CASSANDRA_JMX_USER -pw $CASSANDRA_JMX_PWD gettraceprobability
+    # setlogginglevel org.apache.cassandra.transport TRACE
+    ;;
   create-data)
     _cassandra_create_data
+    ;;
+  bash)
+    NODE_NAME=${2:-$CASSANDRA_NODE_1}
+    NODE_ID=`docker inspect --format='{{ .Id }}' $NODE_NAME`
+    docker exec -it $NODE_ID bash
     ;;
   load-gen)
     _cassandra_load_gen $@

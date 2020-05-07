@@ -245,9 +245,10 @@ JVM_ON_OUT_OF_MEMORY_ERROR_OPT="-XX:OnOutOfMemoryError=kill -9 %p"
 # To enable remote JMX connections, uncomment lines below
 # with authentication and/or ssl enabled. See https://wiki.apache.org/cassandra/JmxSecurity
 #
-if [ "x$LOCAL_JMX" = "x" ]; then
-    LOCAL_JMX=yes
-fi
+# Modification_2:
+#if [ "x$LOCAL_JMX" = "x" ]; then
+#    LOCAL_JMX=yes
+#fi
 
 # Specifies the default port over which Cassandra will be available for
 # JMX connections.

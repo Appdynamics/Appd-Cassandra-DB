@@ -15,5 +15,6 @@ COPY envvars.sh           ${CASSANDRA_CONFIG_DIR}/
 COPY cassandra.yaml	      ${CASSANDRA_CONFIG_DIR}/
 COPY cassandra-env.sh     ${CASSANDRA_CONFIG_DIR}/
 COPY jmxremote.password   ${CASSANDRA_CONFIG_DIR}/
+COPY jmxremote.access     ${CASSANDRA_CONFIG_DIR}/
 
 RUN cd ${CASSANDRA_CONFIG_DIR}; ./ctl.sh cassandra-configure

@@ -38,6 +38,10 @@ Create a keyspace, table and insert data
 
 `./ctl.sh create-date`
 
+Turn on tracing
+
+`./ctl.sh nodes-trace`
+
 Generate load on the DB
 
 `./ctl.sh load-gen 5 1`

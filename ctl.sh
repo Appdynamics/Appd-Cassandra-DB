@@ -124,6 +124,7 @@ _cassandra_configure() {
   cp $CASSANDRA_CONFIG_DIR/cassandra.yaml       /etc/cassandra
   cp $CASSANDRA_CONFIG_DIR/cassandra-env.sh     /etc/cassandra
   cp $CASSANDRA_CONFIG_DIR/jmxremote.password   /etc/cassandra
+  cp $CASSANDRA_CONFIG_DIR/jmxremote.access     /etc/cassandra
 }
 
 _docker_get_container_id() {

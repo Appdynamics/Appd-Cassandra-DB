@@ -38,9 +38,9 @@ Create a keyspace, table and insert data
 
 `./ctl.sh create-data`
 
-Generate load on the DB
+Generate load on the DB - 5000 iterations at 5 seconds each
 
-`./ctl.sh load-gen 5 1`
+`./ctl.sh load-gen 5000 5`
 
 Stop and delete the nodes
 

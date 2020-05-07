@@ -78,7 +78,7 @@ _cassandra_nodes_create() {
   echo "Node 2 IP $NODE2_IP"
 
   # Get Node 1 ID
-  NODE1_ID=`docker inspect --format='{{ .Id }}' cnode1`
+  NODE1_ID=`docker inspect --format='{{ .Id }}' $CASSANDRA_NODE_1`
   docker exec -it $NODE1_ID nodetool -u $CASSANDRA_JMX_USER -pw $CASSANDRA_JMX_PWD status
 }
 
@@ -124,6 +124,11 @@ _cassandra_configure() {
   cp $CASSANDRA_CONFIG_DIR/cassandra.yaml       /etc/cassandra
   cp $CASSANDRA_CONFIG_DIR/cassandra-env.sh     /etc/cassandra
   cp $CASSANDRA_CONFIG_DIR/jmxremote.password   /etc/cassandra
+}
+
+_docker_get_container_id() {
+  CONTAINER_NAME=$1
+  echo `docker inspect --format='{{ .Id }}' $CONTAINER_NAME`
 }
 
 # Define the namespace and list of K8s resources to deploy into that namespace

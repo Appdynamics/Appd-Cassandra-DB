@@ -20,7 +20,7 @@ Update Ubuntu OS
 
 Install the latest version of Docker CE, version 19.03.8 recommended
 
-`./ctl.sh docker install`
+`./ctl.sh docker-install`
 
 Build the Docker images
 

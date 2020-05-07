@@ -60,6 +60,7 @@ _validateEnvironmentVars() {
 _cassandra_nodes_create() {
   docker run --rm --name $CASSANDRA_NODE_1 \
          -p 9042:9042 \
+         -p 7199:7199 \
          -v "$CASSANDRA_DATA_DIR/$CASSANDRA_NODE_1":/var/lib/cassandra/data \
          -e CASSANDRA_CLUSTER_NAME=$CASSANDRA_CLUSTER_NAME \
          -e CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch \

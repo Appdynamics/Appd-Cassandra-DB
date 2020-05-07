@@ -12,3 +12,6 @@ export CASSANDRA_NODE_3="cnode3"
 # Cassandra DB
 export CASSANDRA_DB_USER="cassandra"
 export CASSANDRA_DB_PWD="cassandra"
+
+# Configuration dir in container
+export CASSANDRA_CONFIG_DIR="/config-cassandra"

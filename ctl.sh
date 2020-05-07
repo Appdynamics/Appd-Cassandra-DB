@@ -113,7 +113,7 @@ _cassandra_create_data() {
   docker exec -it $NODE1_ID nodetool status
 
   # Create keyspace, table and insert data
-  docker exec -it $NODE1_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD -f /create-db.cql
+  docker exec -it $NODE1_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD -f $CASSANDRA_CONFIG_DIR/create-db.cql
 }
 
 
@@ -125,9 +125,14 @@ _cassandra_load_gen() {
   echo "Iterations $INTERATIONS_N Interval $INTERVAL_SEC"
   for i in $(seq $INTERATIONS_N )
   do
-    docker exec -it $NODE1_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD -f /query-db.cql
+    docker exec -it $NODE1_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD -f $CASSANDRA_CONFIG_DIR/query-db.cql
     sleep $INTERVAL_SEC
   done
+}
+
+_cassandra_configure() {
+  cp /cassandra/cassandra.yaml    /etc/cassandra
+  cp /cassandra/cassandra-env.sh  /etc/cassandra
 }
 
 # Define the namespace and list of K8s resources to deploy into that namespace
@@ -143,7 +148,7 @@ case "$CMD_LIST" in
     _DockerCE_Install
     ;;
   build)
-    docker build -t $DOCKER_TAG_NAME .
+    docker build --build-arg CASSANDRA_CONFIG_DIR=${CASSANDRA_CONFIG_DIR} -t $DOCKER_TAG_NAME .
     ;;
   nodes-create)
   _cassandra_nodes_create
@@ -151,7 +156,7 @@ case "$CMD_LIST" in
   nodes-status)
     NODE1_ID=`docker inspect --format='{{ .Id }}' cnode1`
     docker exec -it $NODE1_ID nodetool status
-    docker exec -it $NODE1_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD -f /show-version.cql
+    docker exec -it $NODE1_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD -f $CASSANDRA_CONFIG_DIR/show-version.cql
     ;;
   nodes-stop)
     _cassandra_nodes_stop
@@ -161,6 +166,9 @@ case "$CMD_LIST" in
     ;;
   load-gen)
     _cassandra_load_gen $@
+    ;;
+  cassandra-configure)
+    _cassandra_configure
     ;;
   del-force)
     docker rmi $(docker images -q) -f

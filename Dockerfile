@@ -1,7 +1,5 @@
 FROM cassandra:latest
 
-# Modify Cassandra configuration to allow authentication
-#RUN sed -i 's/^authenticator.\+$/authenticator: PasswordAuthenticator/g' /etc/cassandra/cassandra.yaml
 ARG CASSANDRA_CONFIG_DIR
 
 RUN apt-get update -yqq   &&  \

@@ -1259,3 +1259,7 @@ enable_materialized_views: true
 # Enables SASI index creation on this node.
 # SASI indexes are considered experimental and are not recommended for production use.
 enable_sasi_indexes: true
+
+
+# TTL for different trace types used during logging of the repair process.
+tracetype_query_ttl: 300

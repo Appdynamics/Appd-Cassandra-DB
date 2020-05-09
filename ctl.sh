@@ -121,10 +121,14 @@ _cassandra_load_gen() {
 }
 
 _cassandra_configure() {
+  # Copy conf files
   cp $CASSANDRA_CONFIG_DIR/cassandra.yaml       /etc/cassandra
   cp $CASSANDRA_CONFIG_DIR/cassandra-env.sh     /etc/cassandra
   cp $CASSANDRA_CONFIG_DIR/jmxremote.password   /etc/cassandra
   cp $CASSANDRA_CONFIG_DIR/jmxremote.access     /etc/cassandra
+  # Permissions
+  chmod 400 /etc/cassandra/jmxremote.password
+  chmod 400 /etc/cassandra/jmxremote.access
 }
 
 _docker_get_container_id() {
@@ -171,6 +175,11 @@ case "$CMD_LIST" in
     NODE_NAME=${2:-$CASSANDRA_NODE_1}
     NODE_ID=`docker inspect --format='{{ .Id }}' $NODE_NAME`
     docker exec -it $NODE_ID bash
+    ;;
+  cqlsh)
+    NODE_NAME=${2:-$CASSANDRA_NODE_1}
+    NODE_ID=$(_docker_get_container_id $NODE_NAME )
+    docker exec -it $NODE_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD
     ;;
   load-gen)
     _cassandra_load_gen $@

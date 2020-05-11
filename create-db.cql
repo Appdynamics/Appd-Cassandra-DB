@@ -1,26 +1,20 @@
-create keyspace CityInfo with replication = {'class' : 'SimpleStrategy', 'replication_factor':2};
+create keyspace Test1_keyspace with replication = {'class' : 'SimpleStrategy', 'replication_factor':2};
 
+use Test1_keyspace;
 
-use CityInfo;
-
-
-CREATE TABLE cities (
- id int,
- name text,
- country text,
- PRIMARY KEY(id)
+CREATE TABLE Test1_table (
+  id int,
+  v1 text,
+  v2 text,
+  PRIMARY KEY(id)
 );
 
-INSERT INTO cities(id,name,country) VALUES (1,'Karachi','Pakistan');
-INSERT INTO cities(id,name,country) VALUES (2,'Lahore','Pakistan');
-INSERT INTO cities(id,name,country) VALUES (3,'Dubai','UAE');
-INSERT INTO cities(id,name,country) VALUES (4,'Berlin','Germany');
-INSERT INTO cities(id,name,country) VALUES (5,'San Francisco','USA');
-INSERT INTO cities(id,name,country) VALUES (6,'New York','USA');
-INSERT INTO cities(id,name,country) VALUES (7,'Dallas','USA');
-INSERT INTO cities(id,name,country) VALUES (8,'London','UK');
-INSERT INTO cities(id,name,country) VALUES (9,'Paris','France');
+INSERT INTO Test1_table(id,v1,v2) VALUES (1,'a','aa');
+INSERT INTO Test1_table(id,v1,v2) VALUES (2,'b','ab');
+INSERT INTO Test1_table(id,v1,v2) VALUES (3,'c','cc');
+INSERT INTO Test1_table(id,v1,v2) VALUES (4,'d','dd');
+INSERT INTO Test1_table(id,v1,v2) VALUES (5,'e','ee');
 
-select * from cities;
+select * from Test1_table;
 
 exit;

@@ -1,8 +1,8 @@
 
-use CityInfo;
+use Test1_keyspace;
 
 TRACING ON;
 
-select * from cities;
+select * from Test1_table;
 
 exit;

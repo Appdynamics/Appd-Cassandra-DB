@@ -107,7 +107,7 @@ _cassandra_create_data() {
 }
 
 
-_cassandra_load_gen() {
+_cassandra_load_gen_read() {
   # Get Node 1 ID
   NODE1_ID=`docker inspect --format='{{ .Id }}' $CASSANDRA_NODE_1`
   INTERATIONS_N=${2:-"2"}
@@ -116,6 +116,45 @@ _cassandra_load_gen() {
   for i in $(seq $INTERATIONS_N )
   do
     docker exec -it $NODE1_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD -f $CASSANDRA_CONFIG_DIR/query-db.cql
+    sleep $INTERVAL_SEC
+  done
+}
+
+_cassandra_load_gen_insert() {
+  # Get Node 1 ID
+  NODE_ID=$(_docker_get_container_id $CASSANDRA_NODE_1 )
+  INTERATIONS_N=${2:-"2"}
+  INTERVAL_SEC=${3:-"5"}
+  echo "Iterations $INTERATIONS_N Interval $INTERVAL_SEC"
+  for i in $(seq $INTERATIONS_N )
+  do
+    DATA_ID=$((RANDOM % 10000))
+    DATA_V1=`uuidgen | cut -c 1-13`
+    DATA_V2=`uuidgen | cut -c 1-13`
+    docker exec -it $NODE_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD \
+      -e "use Test1_keyspace; TRACING ON; insert into Test1_table(id,v1,v2) VALUES ($DATA_ID,'$DATA_V1','$DATA_V2');"
+    sleep $INTERVAL_SEC
+  done
+}
+
+_cassandra_load_gen() {
+  # Get Node 1 ID
+  NODE_ID=$(_docker_get_container_id $CASSANDRA_NODE_1 )
+  INTERATIONS_N=${2:-"2"}
+  INTERVAL_SEC=${3:-"5"}
+  echo "Iterations $INTERATIONS_N Interval $INTERVAL_SEC"
+  for i in $(seq $INTERATIONS_N ); do
+    echo "$i"
+    if [ $((RANDOM % 10)) -gt 6 ]; then
+      DATA_ID=$((RANDOM % 10000))
+      DATA_V1=`uuidgen | cut -c 1-13`
+      DATA_V2=`uuidgen | cut -c 1-13`
+      docker exec -it $NODE_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD \
+        -e "use Test1_keyspace; insert into Test1_table(id,v1,v2) VALUES ($DATA_ID,'$DATA_V1','$DATA_V2');"
+    else
+      docker exec -it $NODE_ID cqlsh -u $CASSANDRA_DB_USER -p $CASSANDRA_DB_PWD \
+        -e "use Test1_keyspace; TRACING ON; select count(*) from Test1_table;"
+    fi
     sleep $INTERVAL_SEC
   done
 }
